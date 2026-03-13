@@ -32,7 +32,7 @@ Glavni cilji projekta so:
 
 Podatki bodo pridobljeni z javno dostopne spletne strani:
 
-https://www.avto.net/
+https://www.avto.net/ \n
 https://podatki.gov.si/dataset/evidenca-registriranih-vozil-presek-stanja
 
 
