@@ -35,6 +35,9 @@ avtomobili3 = pd.read_csv(
 
 
 avtomobili = pd.concat([avtomobili1, avtomobili2, avtomobili3], ignore_index=True)
+avtomobili = avtomobili[
+    avtomobili["J-Kategorija in vrsta vozila (opis)"] == "osebni avtomobil"
+]
 
 def starost_vozila_graf(avtomobili):
     avtomobili["B-Datum prve registracije vozila"] = pd.to_datetime(
@@ -55,6 +58,8 @@ def starost_vozila_graf(avtomobili):
     plt.figure()
 
 
+
+#rabi izboljšave
 def emisije_gorivo_graf(avtomobili):
     # pretvorba v numeric
     avtomobili["V7-CO2"] = (
@@ -75,6 +80,8 @@ def emisije_gorivo_graf(avtomobili):
     plt.ylabel("CO2")
 
     plt.show()
+
+
 
 
 def masa_moc_graf(avtomobili):
@@ -119,6 +126,7 @@ def masa_moc_graf(avtomobili):
     plt.ylabel("Poraba (L/100 km)")
     plt.show()
 
+
 def naj_obcine_graf(avtomobili):
     top_obcine = avtomobili["C13-Upravna enota uporabnika vozila (opis)"].value_counts().head(10)
 
@@ -130,6 +138,7 @@ def naj_obcine_graf(avtomobili):
     plt.ylabel("Število vozil")
     plt.xticks(rotation=45)
     plt.show()
+
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
@@ -194,6 +203,8 @@ def co2_razlike(avtomobili):
 
     plt.show()
 
+
+
 def trend_registracij(avtomobili):
     avtomobili["datum"] = pd.to_datetime(
         avtomobili["B-Datum prve registracije vozila"],
@@ -205,6 +216,7 @@ def trend_registracij(avtomobili):
 
 
     avtomobili = avtomobili[avtomobili["leto"] > 1990]
+    
 
     fuel_df = avtomobili[
         avtomobili["P13-Vrsta goriva (opis)"].isin(["Bencin", "Dizel"])
@@ -220,6 +232,8 @@ def trend_registracij(avtomobili):
     plt.ylabel("Število vozil")
 
     plt.show()
+
+    
 
 # Še malo delat na tem, da je bolj lepo in smisleno
 def naj_znamke_modeli(avtomobili):
@@ -246,6 +260,8 @@ def naj_znamke_modeli(avtomobili):
     plt.ylabel("Število")
     plt.xticks(rotation=45)
     plt.show()
+
+
 
 def trend_po_regijah(avtomobili):
     dovoljene_regije = [
@@ -314,6 +330,8 @@ def trend_po_regijah(avtomobili):
     plt.colorbar()
 
     plt.show()
+
+
 
 # Ima eden prazen graf, je treba to popraviti
 def trend_ev(avtomobili):
@@ -407,5 +425,3 @@ def trend_ev(avtomobili):
 
     plt.show()
 
-
-trend_ev(avtomobili)
