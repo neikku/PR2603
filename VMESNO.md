@@ -27,25 +27,25 @@ Grafi in rezultati temeljijo na lastni izvorni kodi, ki je vključena v projekt.
 
 Najprej smo analizirali trende glede vrste goriva. Opazili smo, da v zadnjih letih prevladujejo bencinska vozila, medtem ko delež dizelskih vozil postopoma upada.
 
-**bencin_dizel_trend.png**
+![Dizel vs Bencin](slike/dizel_bencin_trend.png)
 
 Ta trend lahko razložimo z več dejavniki. V Evropi se po letu 2015 zmanjšuje priljubljenost dizelskih vozil, predvsem zaradi okoljskih regulacij in afer povezanih z emisijami. Poleg tega so dizelski motorji manj primerni za kratke mestne vožnje, ki postajajo vedno pogostejše.
 
 Opazili smo tudi izrazit porast električnih in hibridnih vozil.
 
-**ev_rast.png**
+![Rast EV](slike/rast_ev.png)
 
 Podrobnejša analiza pokaže, da se je rast začela okoli leta 2016. To sovpada z več dejavniki: državnimi subvencijami, padanjem cen baterij ter večjo dostopnostjo električnih vozil. Tudi na ravni Evropske unije se spodbuja zmanjševanje emisij, kar dodatno vpliva na odločitve kupcev.
 
 Regionalna analiza kaže, da je rast električnih vozil najizrazitejša v večjih mestih, kot sta Ljubljana in Maribor.
 
-**ev_regije.png**
+![Rast EV po regijah](slike/rast_ev_po_regijah.png)
 
 To je pričakovano, saj imajo urbana območja bolj razvito infrastrukturo (polnilnice), višji dohodek prebivalcev ter večjo okoljsko ozaveščenost. Prav tako mestni promet bolj ustreza električnim vozilom zaradi krajših razdalj.
 
 Pri analizi znamk električnih vozil smo ugotovili, da izstopa Toyota.
 
-**ev_znamke.png**
+![Najbolj popularne znamke EV](slike/naj_znamke_ev.png)
 
 To lahko pripišemo dejstvu, da Toyota že dolgo razvija hibridna vozila, ki so cenovno dostopnejša kot popolnoma električna vozila in zato predstavljajo vmesno stopnjo prehoda.
 
@@ -53,7 +53,7 @@ To lahko pripišemo dejstvu, da Toyota že dolgo razvija hibridna vozila, ki so 
 
 Analiza starosti vozil pokaže, da je največ vozil starih med 10 in 15 let.
 
-**starost_porazdelitev.png**
+![Starost vozila](slike/starost_vozila.png)
 
 To pomeni, da slovenski vozni park temelji predvsem na rabljenih vozilih. V primerjavi z zahodno Evropo je povprečna starost vozil v Sloveniji višja, kar kaže na počasnejšo obnovo voznega parka. Razlogi za to so lahko nižja kupna moč ter večja uporaba uvoženih rabljenih vozil.
 
@@ -67,7 +67,7 @@ Ugotovili smo, da je Volkswagen najbolj zastopana znamka, sledijo pa Renault in 
 
 S pomočjo heatmap analize smo preverili razširjenost znamk po regijah.
 
-**heatmap_znamke.png**
+![Znamke po regijah](slike/znamke_po_regijah.png)
 
 Rezultati potrjujejo, da Volkswagen prevladuje v večini regij, kar kaže na enotne preference kupcev po celotni državi.
 
@@ -75,9 +75,9 @@ Rezultati potrjujejo, da Volkswagen prevladuje v večini regij, kar kaže na eno
 
 Analizirali smo povezavo med maso vozila in porabo ter maso in močjo motorja.
 
-**masa_poraba.png**
+![Masa in poraba](slike/poraba_masa.png)
 
-**masa_moc.png**
+![Masa in moč](slike/masa_moc.png)
 
 Rezultati kažejo, da ni močne linearne korelacije. To pomeni, da sama masa vozila ni dovolj za napoved porabe ali moči, saj pomembno vlogo igrajo tudi tehnologija motorja, tip goriva in aerodinamične lastnosti.
 
