@@ -94,8 +94,11 @@ Na podlagi teh rezultatov lahko sklepamo, da se bo trend prehoda na okolju prija
 Dolgoročno lahko pričakujemo zmanjševanje deleža vozil na dizel, stabilizacijo bencinskih vozil ter hitro rast električnih vozil, še posebej v urbanih območjih.
 
 
+Rezultati kažejo, da med lastnostmi vozil obstajajo zmerne povezave, vendar ne izrazito močne linearne korelacije. Masa vozila je zmerno povezana z močjo in prostornino motorja, kar pomeni, da težja vozila pogosto potrebujejo večjo moč, vendar to ni vedno pravilo. Po drugi strani pa je povezava med emisijami CO₂ in ostalimi spremenljivkami zelo šibka, kar nakazuje, da na emisije vpliva več dejavnikov, kot so učinkovitost motorja, vrsta goriva in tehnologija vozila.
+
+
 ![Korelacija med lastnostmi vozil](slike/lastnosti_vozil.png)
 
-
+Raztreseni diagram CO₂ glede na starost vozila dodatno potrjuje, da starost sama po sebi ni dober napovednik emisij. Podatki so močno razpršeni brez jasnega trenda, kar pomeni, da lahko tako starejša kot novejša vozila dosegajo podobne ravni emisij. To nakazuje, da imajo večji vpliv drugi dejavniki, kot so vzdrževanje vozila, tehnološke izboljšave in način uporabe.
 
 ![CO2 emisije glede na starost vozila](slike/co2_starost.png)
