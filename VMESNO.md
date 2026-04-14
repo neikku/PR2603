@@ -92,3 +92,10 @@ Pomembna ugotovitev je, da imajo vozila na fosilna goriva bistveno višje emisij
 Na podlagi teh rezultatov lahko sklepamo, da se bo trend prehoda na okolju prijaznejša vozila nadaljeval. K temu prispevajo zakonodaja, subvencije, višje cene goriv ter večja okoljska ozaveščenost prebivalcev.
 
 Dolgoročno lahko pričakujemo zmanjševanje deleža vozil na dizel, stabilizacijo bencinskih vozil ter hitro rast električnih vozil, še posebej v urbanih območjih.
+
+
+![Korelacija med lastnostmi vozil](slike/lastnosti_vozil.png)
+
+
+
+![CO2 emisije glede na starost vozila](slike/co2_starost.png)
