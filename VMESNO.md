@@ -27,25 +27,25 @@ Grafi in rezultati temeljijo na lastni izvorni kodi, ki je vključena v projekt.
 
 Najprej smo analizirali trende glede vrste goriva. Opazili smo, da v zadnjih letih prevladujejo bencinska vozila, medtem ko delež dizelskih vozil postopoma upada.
 
-**bencin_dizel_trend.png**
+![Dizel vs Bencin](slike/dizel_bencin_trend.png)
 
 Ta trend lahko razložimo z več dejavniki. V Evropi se po letu 2015 zmanjšuje priljubljenost dizelskih vozil, predvsem zaradi okoljskih regulacij in afer povezanih z emisijami. Poleg tega so dizelski motorji manj primerni za kratke mestne vožnje, ki postajajo vedno pogostejše.
 
 Opazili smo tudi izrazit porast električnih in hibridnih vozil.
 
-**ev_rast.png**
+![Rast EV](slike/rast_ev.png)
 
 Podrobnejša analiza pokaže, da se je rast začela okoli leta 2016. To sovpada z več dejavniki: državnimi subvencijami, padanjem cen baterij ter večjo dostopnostjo električnih vozil. Tudi na ravni Evropske unije se spodbuja zmanjševanje emisij, kar dodatno vpliva na odločitve kupcev.
 
 Regionalna analiza kaže, da je rast električnih vozil najizrazitejša v večjih mestih, kot sta Ljubljana in Maribor.
 
-**ev_regije.png**
+![Rast EV po regijah](slike/rast_ev_po_regijah.png)
 
 To je pričakovano, saj imajo urbana območja bolj razvito infrastrukturo (polnilnice), višji dohodek prebivalcev ter večjo okoljsko ozaveščenost. Prav tako mestni promet bolj ustreza električnim vozilom zaradi krajših razdalj.
 
 Pri analizi znamk električnih vozil smo ugotovili, da izstopa Toyota.
 
-**ev_znamke.png**
+![Najbolj popularne znamke EV](slike/naj_znamke_ev.png)
 
 To lahko pripišemo dejstvu, da Toyota že dolgo razvija hibridna vozila, ki so cenovno dostopnejša kot popolnoma električna vozila in zato predstavljajo vmesno stopnjo prehoda.
 
@@ -53,7 +53,7 @@ To lahko pripišemo dejstvu, da Toyota že dolgo razvija hibridna vozila, ki so 
 
 Analiza starosti vozil pokaže, da je največ vozil starih med 10 in 15 let.
 
-**starost_porazdelitev.png**
+![Starost vozila](slike/starost_vozila.png)
 
 To pomeni, da slovenski vozni park temelji predvsem na rabljenih vozilih. V primerjavi z zahodno Evropo je povprečna starost vozil v Sloveniji višja, kar kaže na počasnejšo obnovo voznega parka. Razlogi za to so lahko nižja kupna moč ter večja uporaba uvoženih rabljenih vozil.
 
@@ -61,13 +61,13 @@ Pri starejših vozilih (nad 20 let) število hitro upada, kar je posledica tehni
 
 Analizirali smo tudi najbolj popularne znamke vozil.
 
-**znamke_popularnost.png**
+![Najbolj popularne znamke](slike/naj_znamke.png)
 
-Ugotovili smo, da je Volkswagen najbolj zastopana znamka, sledijo pa Renault in druge evropske znamke. Ta rezultat je pričakovan, saj imajo evropski proizvajalci dolgo tradicijo na tem trgu ter dobro razmerje med ceno in kakovostjo.
+Ugotovili smo, da je Volkswagen najbolj zastopana znamka, sledijo pa Renault in druge evropske znamke. Ta rezultat je pričakovan, saj imajo evropski proizvajalci dolgo tradicijo na tem trgu.
 
 S pomočjo heatmap analize smo preverili razširjenost znamk po regijah.
 
-**heatmap_znamke.png**
+![Znamke po regijah](slike/znamke_po_regijah.png)
 
 Rezultati potrjujejo, da Volkswagen prevladuje v večini regij, kar kaže na enotne preference kupcev po celotni državi.
 
@@ -75,15 +75,15 @@ Rezultati potrjujejo, da Volkswagen prevladuje v večini regij, kar kaže na eno
 
 Analizirali smo povezavo med maso vozila in porabo ter maso in močjo motorja.
 
-**masa_poraba.png**
+![Masa in poraba](slike/poraba_masa.png)
 
-**masa_moc.png**
+![Masa in moč](slike/masa_moc.png)
 
 Rezultati kažejo, da ni močne linearne korelacije. To pomeni, da sama masa vozila ni dovolj za napoved porabe ali moči, saj pomembno vlogo igrajo tudi tehnologija motorja, tip goriva in aerodinamične lastnosti.
 
 Nato smo primerjali napovedane in dejanske emisije CO₂.
 
-**co2_primerjava.png**
+![CO2 primerjava](slike/co2.png)
 
 Opazili smo določena odstopanja, kar kaže na razliko med laboratorijskimi meritvami in dejanskimi pogoji vožnje. To je znan problem v avtomobilski industriji, kjer standardizirani testi ne odražajo vedno realne uporabe.
 
@@ -92,3 +92,13 @@ Pomembna ugotovitev je, da imajo vozila na fosilna goriva bistveno višje emisij
 Na podlagi teh rezultatov lahko sklepamo, da se bo trend prehoda na okolju prijaznejša vozila nadaljeval. K temu prispevajo zakonodaja, subvencije, višje cene goriv ter večja okoljska ozaveščenost prebivalcev.
 
 Dolgoročno lahko pričakujemo zmanjševanje deleža vozil na dizel, stabilizacijo bencinskih vozil ter hitro rast električnih vozil, še posebej v urbanih območjih.
+
+
+Rezultati kažejo, da med lastnostmi vozil obstajajo zmerne povezave, vendar ne izrazito močne linearne korelacije. Masa vozila je zmerno povezana z močjo in prostornino motorja, kar pomeni, da težja vozila pogosto potrebujejo večjo moč, vendar to ni vedno pravilo. Po drugi strani pa je povezava med emisijami CO₂ in ostalimi spremenljivkami zelo šibka, kar nakazuje, da na emisije vpliva več dejavnikov, kot so učinkovitost motorja, vrsta goriva in tehnologija vozila.
+
+
+![Korelacija med lastnostmi vozil](slike/lastnosti_vozil.png)
+
+Raztreseni diagram CO₂ glede na starost vozila dodatno potrjuje, da starost sama po sebi ni dober napovednik emisij. Podatki so močno razpršeni brez jasnega trenda, kar pomeni, da lahko tako starejša kot novejša vozila dosegajo podobne ravni emisij. To nakazuje, da imajo večji vpliv drugi dejavniki, kot so vzdrževanje vozila, tehnološke izboljšave in način uporabe.
+
+![CO2 emisije glede na starost vozila](slike/co2_starost.png)
