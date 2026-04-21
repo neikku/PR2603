@@ -265,6 +265,17 @@ def naj_znamke_modeli(avtomobili):
     plt.xticks(rotation=45)
     plt.show()
 
+def trenutni_trend(avtomobili):
+    top_goriva = avtomobili["P13-Vrsta goriva (opis)"].value_counts().head(2)
+    plt.figure()
+    top_goriva.plot(kind="bar")
+    plt.title("Trenutni trend goriv")
+    plt.xlabel("Vrsta goriva")  
+    plt.ylabel("Število vozil")
+    plt.xticks(rotation=45)
+    plt.show()
+
+   
 
 
 def trend_po_regijah(avtomobili):
