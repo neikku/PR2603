@@ -4,10 +4,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 import joblib
 import json, glob
+import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+import main as m
 
 
 st.set_page_config(page_title="Analiza vozil", layout="wide")
 
+
+def _read_csv(path):
+    df = pd.read_csv(path, sep=";", encoding="latin-1",
+                     quotechar='"', on_bad_lines="skip", low_memory=False)
+    # Odstrani BOM marker iz imen stolpcev (Vozila1.csv ga ima)
+    df.columns = df.columns.str.replace("ï»¿", "", regex=False).str.strip()
+    return df
+
+@st.cache_data
+def load_register():
+    """Naloži slovenski register vozil (Vozila1/2/3.csv) – enako kot main.py."""
+    a1 = _read_csv("data/Vozila1.csv")
+    a2 = _read_csv("data/Vozila2.csv")
+    a3 = _read_csv("data/Vozila3.csv")
+    av = pd.concat([a1, a2, a3], ignore_index=True)
+    av = av[av["J-Kategorija in vrsta vozila (opis)"] == "osebni avtomobil"]
+    return av
 
 @st.cache_data
 def load_data():
@@ -69,120 +89,77 @@ stran = st.sidebar.radio("Izberi razdelek:", ["Analiza podatkov", "Napoved cene"
 
 if stran == "Analiza podatkov":
 
-    st.title("Interaktivna analiza vozil")
+    st.title("Interaktivna analiza slovenskega registra vozil")
 
-    with st.expander("Filtri", expanded=True):
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            izbrane_znamke = st.multiselect(
-                "Znamka", sorted(df["brand"].unique()),
-                default=sorted(df["brand"].unique())
-            )
-        with col2:
-            izbrano_gorivo = st.multiselect(
-                "Gorivo", sorted(df["fuel"].unique()),
-                default=sorted(df["fuel"].unique())
-            )
-        with col3:
-            leto_min, leto_max = int(df["year"].min()), int(df["year"].max())
-            leto_range = st.slider("Leto registracije", leto_min, leto_max,
-                                   (leto_min, leto_max))
+    av = load_register()
+    st.caption(f"Skupaj osebnih avtomobilov v registru: **{len(av):,}**".replace(",", "."))
 
-    fdf = df[
-        df["brand"].isin(izbrane_znamke) &
-        df["fuel"].isin(izbrano_gorivo) &
-        df["year"].between(leto_range[0], leto_range[1])
-    ]
-
-    st.caption(f"Prikazano vozil: **{len(fdf)}** / {len(df)}")
-
-    graf = st.selectbox("Izberi graf:", [
-        "Porazdelitev cen",
-        "Cena glede na znamko",
-        "Cena glede na gorivo",
-        "Cena glede na leto",
-        "Cena vs prevozeni km",
-        "Cena vs moc (kW)",
-        "Porazdelitev prevozenih km",
-        "Stevilo vozil po znamki",
+    graf = st.selectbox("Izberi analizo:", [
+        "Porazdelitev starosti vozil",
+        "CO2 emisije glede na gorivo",
+        "Masa vs moč vozila",
+        "Poraba goriva glede na maso",
+        "Top 10 občin po številu vozil",
+        "Trend registracij: Bencin vs Diesel",
+        "Top 10 znamk in modelov",
+        "Trenutni trend goriv",
+        "Rast EV po letih in regijah",
+        "Korelacija med lastnostmi vozil",
+        "CO2 glede na starost vozila",
+        "Znamke po regijah (heatmap)",
     ])
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    av_copy = av.copy()
 
-    if graf == "Porazdelitev cen":
-        ax.hist(fdf["price"].dropna(), bins=40, color="steelblue", edgecolor="white")
-        ax.set_title("Porazdelitev cen vozil")
-        ax.set_xlabel("Cena (EUR)")
-        ax.set_ylabel("Stevilo vozil")
+    if graf == "Porazdelitev starosti vozil":
+        fig = m.starost_vozila_graf(av_copy)
+        st.pyplot(fig); plt.close(fig)
 
-    elif graf == "Cena glede na znamko":
-        order = fdf.groupby("brand")["price"].median().sort_values(ascending=False).index
-        data  = [fdf[fdf["brand"] == b]["price"].dropna().values for b in order]
-        ax.boxplot(data, labels=order)
-        ax.set_title("Cena glede na znamko")
-        ax.set_xlabel("Znamka")
-        ax.set_ylabel("Cena (EUR)")
-        plt.xticks(rotation=30)
+    elif graf == "CO2 emisije glede na gorivo":
+        fig = m.emisije_gorivo_graf(av_copy)
+        st.pyplot(fig); plt.close(fig)
 
-    elif graf == "Cena glede na gorivo":
-        order = fdf.groupby("fuel")["price"].median().sort_values(ascending=False).index
-        data  = [fdf[fdf["fuel"] == g]["price"].dropna().values for g in order]
-        ax.boxplot(data, labels=order)
-        ax.set_title("Cena glede na vrsto goriva")
-        ax.set_xlabel("Gorivo")
-        ax.set_ylabel("Cena (EUR)")
-        plt.xticks(rotation=30)
+    elif graf == "Masa vs moč vozila":
+        fig1 = m.masa_moc_graf(av_copy)
+        st.pyplot(fig1); plt.close(fig1)
 
-    elif graf == "Cena glede na leto":
-        povp = fdf.groupby("year")["price"].median()
-        ax.plot(povp.index, povp.values, marker="o", color="steelblue")
-        ax.set_title("Mediana cene po letu registracije")
-        ax.set_xlabel("Leto")
-        ax.set_ylabel("Cena (EUR)")
+    elif graf == "Poraba goriva glede na maso":
+        fig = m.masa_poraba_graf(av_copy)
+        st.pyplot(fig); plt.close(fig)
 
-    elif graf == "Cena vs prevozeni km":
-        sample = fdf.dropna(subset=["mileage", "price"]).sample(min(500, len(fdf)), random_state=1)
-        ax.scatter(sample["mileage"], sample["price"], alpha=0.5, color="steelblue")
-        ax.set_title("Cena glede na prevozene km")
-        ax.set_xlabel("Prevozeni km")
-        ax.set_ylabel("Cena (EUR)")
+    elif graf == "Top 10 občin po številu vozil":
+        fig = m.naj_obcine_graf(av_copy)
+        st.pyplot(fig); plt.close(fig)
 
-    elif graf == "Cena vs moc (kW)":
-        sample = fdf.dropna(subset=["power_kw", "price"]).sample(min(500, len(fdf)), random_state=1)
-        ax.scatter(sample["power_kw"], sample["price"], alpha=0.5, color="darkorange")
-        ax.set_title("Cena glede na moc motorja")
-        ax.set_xlabel("Moc (kW)")
-        ax.set_ylabel("Cena (EUR)")
+    elif graf == "Trend registracij: Bencin vs Diesel":
+        fig = m.trend_registracij(av_copy)
+        st.pyplot(fig); plt.close(fig)
 
-    elif graf == "Porazdelitev prevozenih km":
-        ax.hist(fdf["mileage"].dropna(), bins=40, color="seagreen", edgecolor="white")
-        ax.set_title("Porazdelitev prevozenih km")
-        ax.set_xlabel("Km")
-        ax.set_ylabel("Stevilo vozil")
+    elif graf == "Top 10 znamk in modelov":
+        fig1, fig2 = m.naj_znamke_modeli(av_copy)
+        st.pyplot(fig1); plt.close(fig1)
+        st.pyplot(fig2); plt.close(fig2)
 
-    elif graf == "Stevilo vozil po znamki":
-        counts = fdf["brand"].value_counts()
-        ax.bar(counts.index, counts.values, color="steelblue")
-        ax.set_title("Stevilo vozil po znamki")
-        ax.set_xlabel("Znamka")
-        ax.set_ylabel("Stevilo")
-        plt.xticks(rotation=30)
+    elif graf == "Trenutni trend goriv":
+        fig = m.trenutni_trend(av_copy)
+        st.pyplot(fig); plt.close(fig)
 
-    st.pyplot(fig)
-    plt.close(fig)
+    elif graf == "Rast EV po letih in regijah":
+        figs = m.trend_ev(av_copy)
+        for f in figs:
+            st.pyplot(f); plt.close(f)
 
-    st.subheader("Tabela vozil")
-    st.dataframe(
-        fdf[["brand", "model", "fuel", "year", "mileage", "power_kw", "price"]]
-        .rename(columns={
-            "brand": "Znamka", "model": "Model", "fuel": "Gorivo",
-            "year": "Leto", "mileage": "Km", "power_kw": "Moc (kW)", "price": "Cena (EUR)"
-        })
-        .sort_values("Cena (EUR)")
-        .reset_index(drop=True),
-        use_container_width=True,
-        height=300,
-    )
+    elif graf == "Korelacija med lastnostmi vozil":
+        fig = m.korelacijski_graf(av_copy)
+        st.pyplot(fig); plt.close(fig)
+
+    elif graf == "CO2 glede na starost vozila":
+        fig = m.starost_co2(av_copy)
+        st.pyplot(fig); plt.close(fig)
+
+    elif graf == "Znamke po regijah (heatmap)":
+        fig = m.trend_po_regijah(av_copy)
+        st.pyplot(fig); plt.close(fig)
 
 
 else:

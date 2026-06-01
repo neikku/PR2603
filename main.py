@@ -1,44 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import streamlit as st
-
-# Load the dataset
-
-avtomobili1 = pd.read_csv(
-    "data/Vozila1.csv",
-    sep=";",
-    encoding="latin-1",
-    quotechar='"',
-    on_bad_lines="skip",
-    low_memory=False
-)
-
-avtomobili2 = pd.read_csv(
-    "data/Vozila2.csv",
-    sep=";",
-    encoding="latin-1",
-    quotechar='"',
-    on_bad_lines="skip",
-    low_memory=False
-)
-
-avtomobili3 = pd.read_csv(
-    "data/Vozila3.csv",
-    sep=";",
-    encoding="latin-1",
-    quotechar='"',
-    on_bad_lines="skip",
-    low_memory=False
-)
-
-
-
-
-avtomobili = pd.concat([avtomobili1, avtomobili2, avtomobili3], ignore_index=True)
-avtomobili = avtomobili[
-    avtomobili["J-Kategorija in vrsta vozila (opis)"] == "osebni avtomobil"
-]
 
 def starost_vozila_graf(avtomobili):
     avtomobili["B-Datum prve registracije vozila"] = pd.to_datetime(
@@ -50,11 +12,14 @@ def starost_vozila_graf(avtomobili):
     avtomobili["V7-CO2"] = pd.to_numeric(avtomobili["V7-CO2"], errors='coerce')
     avtomobili["P12-Nazivna moc"] = pd.to_numeric(avtomobili["P12-Nazivna moc"], errors='coerce')
     avtomobili["G-Masa vozila"] = pd.to_numeric(avtomobili["G-Masa vozila"], errors='coerce')
+    starost = avtomobili["starost_vozila"].dropna()
+    starost = starost[(starost >= 0) & (starost <= 40)]  # max 40 let, brez outlierjev
     fig, ax = plt.subplots()
-    avtomobili["starost_vozila"].dropna().hist(bins=20, ax=ax)
+    starost.hist(bins=40, ax=ax)
     ax.set_title("Porazdelitev starosti vozil")
     ax.set_xlabel("Starost (leta)")
     ax.set_ylabel("Število vozil")
+    ax.set_xlim(0, 40)
     return fig
 
 
@@ -72,13 +37,22 @@ def emisije_gorivo_graf(avtomobili):
 
     # odstrani NaN
     df = avtomobili.dropna(subset=["V7-CO2", "P13-Vrsta goriva (opis)"])
-    df = df[df["V7-CO2"] < 1000]
-    fig, ax = plt.subplots()
-    df.boxplot(column="V7-CO2", by="P13-Vrsta goriva (opis)", rot=45, ax=ax)
-    ax.set_title("CO2 emisije glede na gorivo")
-    fig.suptitle("")
-    ax.set_xlabel("Vrsta goriva")
-    ax.set_ylabel("CO2")
+    df = df[(df["V7-CO2"] > 0) & (df["V7-CO2"] < 400)]
+
+    # Obdrži samo goriva z vsaj 100 vozili
+    top_goriva = df["P13-Vrsta goriva (opis)"].value_counts()
+    top_goriva = top_goriva[top_goriva >= 100].index
+    df = df[df["P13-Vrsta goriva (opis)"].isin(top_goriva)]
+
+    povp = df.groupby("P13-Vrsta goriva (opis)")["V7-CO2"].median().sort_values()
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.barh(povp.index, povp.values, color="steelblue")
+    ax.set_title("Mediana CO2 emisij glede na vrsto goriva")
+    ax.set_xlabel("CO2 (g/km)")
+    ax.set_ylabel("Vrsta goriva")
+    for i, v in enumerate(povp.values):
+        ax.text(v + 1, i, f"{v:.0f}", va="center", fontsize=9)
     return fig
 
 
@@ -105,29 +79,17 @@ def masa_moc_graf(avtomobili):
     df = df[df["P12-Nazivna moc"] < 500]
     df = df[(df["X-Poraba"] > 1) & (df["X-Poraba"] < 30)]
 
-    # --- GRAF 1 ---
-    fig1, ax1 = plt.subplots()
-    ax1.scatter(df["G-Masa vozila"], df["P12-Nazivna moc"], alpha=0.5)
+    # --- GRAF 1: hexbin namesto scatter ---
+    fig1, ax1 = plt.subplots(figsize=(9, 6))
+    hb1 = ax1.hexbin(df["G-Masa vozila"], df["P12-Nazivna moc"], gridsize=40, mincnt=1)
+    fig1.colorbar(hb1, ax=ax1, label="Število vozil")
     ax1.set_title("Masa vs moč vozila")
     ax1.set_xlabel("Masa (kg)")
     ax1.set_ylabel("Moč (kW)")
 
-    # --- GRAF 2 ---
-    df2 = avtomobili.dropna(subset=["G-Masa vozila", "X-Poraba"])
-    df2 = df2[(df2["G-Masa vozila"] < 3000) & (df2["G-Masa vozila"] > 500)]
-    df2 = df2[(df2["X-Poraba"] > 1) & (df2["X-Poraba"] < 30)]
+    return fig1
 
-    fig2, ax2 = plt.subplots()
-    ax2.scatter(df2["G-Masa vozila"], df2["X-Poraba"], alpha=0.5)
-    ax2.set_title("Poraba goriva vs masa")
-    ax2.set_xlabel("Masa (kg)")
-    ax2.set_ylabel("Poraba (L/100 km)")
-    return fig1, fig2
 
-fig = masa_moc_graf(avtomobili)
-st.pyplot(fig[0])
-st.pyplot(fig[1])
-plt.close("all")
 
 def masa_poraba_graf(avtomobili):
     import matplotlib.pyplot as plt
@@ -283,12 +245,12 @@ def naj_znamke_modeli(avtomobili):
     avtomobili["znamka_model"] = avtomobili["D1-Znamka"] + " " + avtomobili["D3-Komerc oznaka"]
     top_models = avtomobili["znamka_model"].value_counts().head(10)
 
-    fig2, ax2 = plt.subplots()
-    top_models.plot(kind="bar", ax=ax2)
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    top_models.plot(kind="barh", ax=ax2)
     ax2.set_title("Top 10 modelov vozil")
-    ax2.set_xlabel("Model")
-    ax2.set_ylabel("Število")
-    plt.xticks(rotation=45)
+    ax2.set_xlabel("Število vozil")
+    ax2.set_ylabel("")
+    ax2.invert_yaxis()
     return fig1, fig2
 
 def trenutni_trend(avtomobili):
@@ -504,10 +466,11 @@ def starost_co2(avtomobili):
     ]
 
     df = df.dropna(subset=["starost", "V7-CO2"])
-    df = df[df["V7-CO2"] < 500]
+    df = df[(df["V7-CO2"] > 0) & (df["V7-CO2"] < 400) & (df["starost"] >= 0) & (df["starost"] <= 30)]
 
-    fig, ax = plt.subplots()
-    ax.scatter(df["starost"], df["V7-CO2"], alpha=0.3)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    h = ax.hist2d(df["starost"], df["V7-CO2"], bins=[30, 60], cmap="viridis")
+    fig.colorbar(h[3], ax=ax, label="Število vozil")
     ax.set_title("CO2 emisije glede na starost vozila")
     ax.set_xlabel("Starost (leta)")
     ax.set_ylabel("CO2 (g/km)")
@@ -536,4 +499,13 @@ def top3_modeli(avtomobili):
     for i, (model, count) in enumerate(top3.items(), start=1):
         print(f"{i}. {model} -> {count} vozil")
 
-top3_modeli(avtomobili)
+def _read_csv(path):
+    df = pd.read_csv(path, sep=";", encoding="latin-1",
+                     quotechar='"', on_bad_lines="skip", low_memory=False)
+    df.columns = df.columns.str.replace("ï»¿", "", regex=False).str.strip()
+    return df
+
+if __name__ == "__main__":
+    avtomobili = pd.concat([_read_csv(f"data/Vozila{i}.csv") for i in [1,2,3]], ignore_index=True)
+    avtomobili = avtomobili[avtomobili["J-Kategorija in vrsta vozila (opis)"] == "osebni avtomobil"]
+    top3_modeli(avtomobili)
