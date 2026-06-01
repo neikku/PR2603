@@ -20,6 +20,9 @@ Aplikacija je dostopna na Streamlit Cloud in omogoča **interaktivno napoved cen
 
 Model uporablja **StackingRegressor** (kombinacija ExtraTreesRegressor + HistGradientBoostingRegressor + RidgeCV) s preprocessing pipeline (RobustScaler + SimpleImputer). Ocenjen z 5-kratno prečno validacijo na 1.124 vozilih.
 
+## Link do aplikacije v streamlitu
+[https://pr2603-dfuggecab5b5sxkjryketh.streamlit.app/]
+
 ## Lokalni zagon
 
 ```bash
