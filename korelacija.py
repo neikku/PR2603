@@ -53,11 +53,6 @@ def clean_dataframe(df):
     df["year"] = df["registration"].astype(str).str.extract(r"(\d{4})").astype(float)
 
     df["age"] = (CURRENT_YEAR - df["year"]).clip(lower=0)
-    df["km_per_year"] = df["mileage"] / (df["age"] + 1)
-    df["power_per_engine"] = df["power"] / (df["engine_size"] + 1)
-    df["features_per_year"] = df["feature_count"] / (df["age"] + 1)
-    df["owners_per_year"] = df["owners"] / (df["age"] + 1)
-    df["power_age"] = df["power"] / (df["age"] + 1)
 
     return df
 
@@ -68,7 +63,7 @@ def create_feature_importance(df, model_name):
     for col in model_df.select_dtypes(include="object"):
         model_df[col] = LabelEncoder().fit_transform(model_df[col].astype(str))
 
-    model_df = model_df.drop(columns=["registration"], errors="ignore")
+    model_df = model_df.drop(columns=["registration", "year"], errors="ignore")
     model_df = model_df.dropna()
 
     if len(model_df) < 50:
@@ -94,9 +89,8 @@ def create_feature_importance(df, model_name):
 
 def create_graphs(df, model_name):
     numeric = [
-        "price", "mileage", "power", "engine_size", "year", "age",
-        "km_per_year", "power_per_engine", "features_per_year",
-        "owners_per_year", "power_age", "owners", "feature_count"
+        "price", "mileage", "power", "engine_size", "age",
+        "owners", "feature_count"
     ]
 
     # ── Korelacijska matrika ──────────────────────────────────────────────────
