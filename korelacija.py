@@ -10,19 +10,12 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder
 
 
-# ==========================================================
-# CONFIG
-# ==========================================================
 
 DATA_FOLDER = Path("data/top5")
 
 
-# ==========================================================
-# HELPERS
-# ==========================================================
 
 def extract_num(x):
-    """Izvleče prvo število iz stringa (npr. '74 kW (101 hp)' -> 74)."""
     if pd.isna(x):
         return None
     m = re.search(r"\d+", str(x).replace(",", "").replace("\xa0", ""))
@@ -30,7 +23,6 @@ def extract_num(x):
 
 
 def extract_engine_size(x):
-    """Izvleče prostornino motorja v ccm (npr. '1,499 ccm' -> 1499)."""
     if pd.isna(x):
         return None
     m = re.search(r"[\d,]+", str(x).replace("\xa0", ""))
@@ -93,7 +85,6 @@ def create_graphs(df, model_name):
         "owners", "feature_count"
     ]
 
-    # ── Korelacijska matrika ──────────────────────────────────────────────────
     corr = df[numeric].corr(numeric_only=True)
 
     fig, ax = plt.subplots(figsize=(12, 10))
@@ -105,7 +96,6 @@ def create_graphs(df, model_name):
     plt.tight_layout()
     plt.show()
 
-    # ── Glavni grafi ──────────────────────────────────────────────────────────
     fig, ax = plt.subplots(2, 2, figsize=(14, 10))
 
     sns.scatterplot(data=df, x="mileage", y="price", ax=ax[0, 0])
@@ -132,7 +122,6 @@ def create_graphs(df, model_name):
     plt.tight_layout()
     plt.show()
 
-    # ── Prostornina motorja ───────────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.regplot(data=df, x="engine_size", y="price", ax=ax)
     ax.set_title(f"{model_name} — Prostornina motorja vs Cena")
@@ -142,9 +131,6 @@ def create_graphs(df, model_name):
     plt.show()
 
 
-# ==========================================================
-# LOAD EACH MODEL SEPARATELY
-# ==========================================================
 
 datasets = {}
 
@@ -173,7 +159,6 @@ for file in DATA_FOLDER.glob("*.json"):
     datasets[model_name] = clean_dataframe(pd.DataFrame(rows))
 
 
-# ── Zaženi za vsak model ──────────────────────────────────────────────────────
 for model_name, df in datasets.items():
     print(f"\n======================\n{model_name.upper()}")
     print(f"Cars: {len(df)}")

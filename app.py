@@ -15,13 +15,11 @@ st.set_page_config(page_title="Analiza vozil", layout="wide")
 def _read_csv(path):
     df = pd.read_csv(path, sep=";", encoding="latin-1",
                      quotechar='"', on_bad_lines="skip", low_memory=False)
-    # Odstrani BOM marker iz imen stolpcev (Vozila1.csv ga ima)
     df.columns = df.columns.str.replace("ï»¿", "", regex=False).str.strip()
     return df
 
 @st.cache_data
 def load_register():
-    """Naloži slovenski register vozil (Vozila1/2/3.csv) – enako kot main.py."""
     a1 = _read_csv("data/Vozila1.csv")
     a2 = _read_csv("data/Vozila2.csv")
     a3 = _read_csv("data/Vozila3.csv")

@@ -25,9 +25,7 @@ def starost_vozila_graf(avtomobili):
 
 
 
-#rabi izboljšave
 def emisije_gorivo_graf(avtomobili):
-    # pretvorba v numeric
     avtomobili["V7-CO2"] = (
         avtomobili["V7-CO2"]
         .astype(str)
@@ -63,7 +61,6 @@ def masa_moc_graf(avtomobili):
     import pandas as pd
     import matplotlib.pyplot as plt
 
-    # --- CLEAN DATA ---
     for col in ["G-Masa vozila", "P12-Nazivna moc", "X-Poraba"]:
         avtomobili[col] = (
             avtomobili[col]
@@ -79,7 +76,6 @@ def masa_moc_graf(avtomobili):
     df = df[df["P12-Nazivna moc"] < 500]
     df = df[(df["X-Poraba"] > 1) & (df["X-Poraba"] < 30)]
 
-    # --- GRAF 1: hexbin namesto scatter ---
     fig1, ax1 = plt.subplots(figsize=(9, 6))
     hb1 = ax1.hexbin(df["G-Masa vozila"], df["P12-Nazivna moc"], gridsize=40, mincnt=1)
     fig1.colorbar(hb1, ax=ax1, label="Število vozil")
@@ -95,7 +91,6 @@ def masa_poraba_graf(avtomobili):
     import matplotlib.pyplot as plt
     import pandas as pd
 
-    # numeric conversion
     cols = ["G-Masa vozila", "X-Poraba"]
 
     for col in cols:
@@ -106,10 +101,10 @@ def masa_poraba_graf(avtomobili):
         )
         avtomobili[col] = pd.to_numeric(avtomobili[col], errors="coerce")
 
-    # clean
+
     df = avtomobili.dropna(subset=cols)
 
-    # odstrani outlierje
+    
     df = df[(df["G-Masa vozila"] > 500) &
         (df["G-Masa vozila"] < 4000) &
         (df["X-Poraba"] < 30)
@@ -147,7 +142,7 @@ from sklearn.metrics import mean_absolute_error
 
 def co2_razlike(avtomobili):
     
-    # --- PRETVORBA DATUMA V STAROST ---
+    
     avtomobili["datum"] = pd.to_datetime(
         avtomobili["B-Datum prve registracije vozila"],
         format="%d.%m.%Y",
@@ -157,7 +152,7 @@ def co2_razlike(avtomobili):
     today = pd.Timestamp.today()
     avtomobili["starost"] = (today - avtomobili["datum"]).dt.days // 365
 
-    # --- CLEAN NUMERIC STOLPCEV ---
+    
     for col in ["G-Masa vozila", "P12-Nazivna moc", "V7-CO2"]:
         avtomobili[col] = (
             avtomobili[col]
@@ -167,12 +162,12 @@ def co2_razlike(avtomobili):
         )
         avtomobili[col] = pd.to_numeric(avtomobili[col], errors="coerce")
 
-    # --- FEATURES + TARGET ---
+    
     features = avtomobili[["G-Masa vozila", "P12-Nazivna moc", "starost"]]
     target = avtomobili["V7-CO2"]
 
     data = pd.concat([features, target], axis=1).dropna()
-    # Remove missing CO2 values, but keep EVs
+    
     data = data[
     (data["V7-CO2"] > 0) |
     (avtomobili["P13-Vrsta goriva (opis)"] == "Elektrika")
@@ -182,19 +177,19 @@ def co2_razlike(avtomobili):
     X = data[["G-Masa vozila", "P12-Nazivna moc", "starost"]]
     y = data["V7-CO2"]
 
-    # --- TRAIN TEST SPLIT ---
+    
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    # --- MODEL ---
+    
     model = RandomForestRegressor()
     model.fit(X_train, y_train)
 
     predictions = model.predict(X_test)
 
-    # --- EVAL ---
+    
     print("MAE:", mean_absolute_error(y_test, predictions))
 
-    # --- GRAF ---
+    
     fig, ax = plt.subplots()
     ax.scatter(y_test, predictions, alpha=0.5)
     ax.set_title("Dejanski vs napovedani CO2")
@@ -231,7 +226,7 @@ def trend_registracij(avtomobili):
     return fig
 
 
-# Še malo delat na tem, da je bolj lepo in smisleno
+
 def naj_znamke_modeli(avtomobili):
     top_brands = avtomobili["D1-Znamka"].value_counts().head(10)
 
@@ -273,7 +268,7 @@ def trend_po_regijah(avtomobili):
         "NOVO MESTO", "NOVA GORICA", "POSTOJNA"
     ]
 
-    # normalizacija (velike črke + odstrani presledke)
+
     avtomobili["regija"] = (
         avtomobili["4A-Registrsko obmocje tablice prve registracije"]
         .astype(str)
@@ -281,16 +276,15 @@ def trend_po_regijah(avtomobili):
         .str.strip()
     )
 
-    # --- FILTER REGIJ ---
+
     avtomobili = avtomobili[avtomobili["regija"].isin(dovoljene_regije)]
 
-    # --- ZNAMKA + MODEL ---
+
     avtomobili["znamka_model"] = (
         avtomobili["D1-Znamka"].astype(str) + " " +
         avtomobili["D3-Komerc oznaka"].astype(str)
     )
 
-    # --- TOP 5 ZNAMK PO REGIJI ---
     brand_region = pd.crosstab(
         avtomobili["regija"],
         avtomobili["D1-Znamka"]
@@ -303,7 +297,6 @@ def trend_po_regijah(avtomobili):
     print("Top 10 znamk po regijah:")
     print(top5_per_region)
 
-    # --- TOP MODELI PO REGIJI ---
     model_region = pd.crosstab(
         avtomobili["regija"],
         avtomobili["znamka_model"]
@@ -313,7 +306,6 @@ def trend_po_regijah(avtomobili):
         print(f"\nRegija: {region}")
         print(model_region.loc[region].sort_values(ascending=False).head(10))
 
-    # --- HEATMAP ---
     top10 = avtomobili["D1-Znamka"].value_counts().head(10).index
 
     filtered = avtomobili[avtomobili["D1-Znamka"].isin(top10)]
@@ -335,16 +327,13 @@ def trend_po_regijah(avtomobili):
 
 
 
-# Ima eden prazen graf, je treba to popraviti
 def trend_ev(avtomobili):
-    # --- DOVOLJENE REGIJE ---
     dovoljene_regije = [
         "LJUBLJANA", "KRANJ", "MARIBOR", "MURSKA SOBOTA",
         "KOPER", "CELJE", "KRŠKO", "SLOVENJ GRADEC",
         "NOVO MESTO", "NOVA GORICA", "POSTOJNA"
     ]
 
-    # --- REGIJA CLEAN ---
     avtomobili["regija"] = (
         avtomobili["4A-Registrsko obmocje tablice prve registracije"]
         .astype(str)
@@ -354,7 +343,6 @@ def trend_ev(avtomobili):
 
     avtomobili = avtomobili[avtomobili["regija"].isin(dovoljene_regije)]
 
-    # --- DATUM ---
     avtomobili["datum"] = pd.to_datetime(
         avtomobili["B-Datum prve registracije vozila"],
         format="%d.%m.%Y",
@@ -363,7 +351,6 @@ def trend_ev(avtomobili):
 
     avtomobili["leto"] = avtomobili["datum"].dt.year
 
-    # --- GORIVO ---
     avtomobili["gorivo"] = avtomobili["P13-Vrsta goriva (opis)"].str.upper()
 
     avtomobili.loc[
@@ -372,10 +359,8 @@ def trend_ev(avtomobili):
         "gorivo"
     ] = "ELEKTRIKA"
 
-    # --- EV DATA ---
     ev_df = avtomobili[avtomobili["gorivo"] == "ELEKTRIKA"]
 
-    # --- TREND ---
     ev_trend = ev_df.groupby("leto").size()
 
     fig1, ax1 = plt.subplots()
@@ -384,7 +369,6 @@ def trend_ev(avtomobili):
     ax1.set_xlabel("Leto")
     ax1.set_ylabel("Število EV")
 
-    # --- DELEŽ ---
     all_trend = avtomobili.groupby("leto").size()
     share = (ev_trend / all_trend) * 100
 
@@ -394,7 +378,6 @@ def trend_ev(avtomobili):
     ax2.set_xlabel("Leto")
     ax2.set_ylabel("Delež (%)")
 
-    # --- KUMULATIVNO ---
     cumulative_ev = ev_trend.cumsum()
 
     fig3, ax3 = plt.subplots()
@@ -403,7 +386,6 @@ def trend_ev(avtomobili):
     ax3.set_xlabel("Leto")
     ax3.set_ylabel("Skupaj EV")
 
-    # --- REGIJE TREND ---
     ev_region = pd.crosstab(ev_df["leto"], ev_df["regija"])
 
     fig4, ax4 = plt.subplots()
@@ -412,7 +394,6 @@ def trend_ev(avtomobili):
     ax4.set_xlabel("Leto")
     ax4.set_ylabel("Število EV")
 
-    # --- TOP ZNAMKE ---
     top_ev_brands = ev_df["D1-Znamka"].value_counts().head(10)
 
     fig5, ax5 = plt.subplots()
@@ -479,19 +460,16 @@ def starost_co2(avtomobili):
 
 def top3_modeli(avtomobili):
 
-    # združi znamko + model
     avtomobili["znamka_model"] = (
         avtomobili["D1-Znamka"].astype(str).str.strip() + " " +
         avtomobili["D3-Komerc oznaka"].astype(str).str.strip()
     )
 
-    # odstrani prazne / nan
     df = avtomobili[
         avtomobili["znamka_model"].notna() &
         (avtomobili["znamka_model"] != "")
     ]
 
-    # top 3 modeli
     top3 = df["znamka_model"].value_counts().head(10)
 
     print("\nTOP 10 najbolj pogosti modeli v Sloveniji:\n")
