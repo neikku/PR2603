@@ -76,7 +76,10 @@ def load_combos(min_count=3):
 
 @st.cache_resource
 def load_model():
-    return joblib.load("data/model.pkl"), joblib.load("data/model_columns.pkl")
+    import pickle
+    pipe = pickle.load(open("data/model2.pkl", "rb"))
+    meta = pickle.load(open("data/model2_meta.pkl", "rb"))
+    return pipe, meta
 
 df           = load_data()
 combos, raw  = load_combos(min_count=3)
@@ -270,26 +273,25 @@ else:
     st.divider()
     if st.button("Napovej ceno", type="primary"):
         input_df = pd.DataFrame([{
-            "brand":           znamka,
-            "model":           izbran_model,
-            "fuel":            gorivo,
-            "transmission":    menjalnik,
-            "year":            float(leto),
-            "mileage":         float(km),
-            "power_kw":        float(izbrana_moc),
-            "previous_owners": float(lastniki),
-            "condition":       stanje,
+            "brand":         znamka,
+            "model":         izbran_model,
+            "fuel":          gorivo,
+            "gear":          menjalnik,
+            "condition":     stanje,
+            "year":          float(leto),
+            "km":            float(km),
+            "power":         float(izbrana_moc),
+            "engine":        float(izbran_ccm),
+            "owners":        float(lastniki),
+            "age":           float(2026 - leto),
+            "feature_count": 0.0,
+            "rating":        np.nan,
         }])
 
-        input_encoded = pd.get_dummies(input_df)
-        for c in cols:
-            if c not in input_encoded.columns:
-                input_encoded[c] = 0
-        input_encoded = input_encoded[cols]
-
-        napoved = model.predict(input_encoded)[0]
+        napoved_log = model.predict(input_df)[0]
+        napoved = float(np.expm1(napoved_log))
         st.success(f"### Napovedana cena: **{napoved:,.0f} EUR**")
-        st.caption(f"Model treniran na ~930 vozilih · MAE ≈ 1 525 EUR")
+        st.caption("StackingRegressor (ExtraTrees + GradientBoosting) · 1.124 vozil · 5-fold CV")
 
 
         st.subheader("Podobna vozila v podatkovni bazi")
@@ -325,7 +327,4 @@ else:
                 .sort_values("Cena (EUR)") \
                 .reset_index(drop=True)
             if len(podobna2):
-                st.info("Ni ujemanja za točno leto — prikazujem podobna vozila (vsa leta).")
-                st.dataframe(podobna2, use_container_width=True)
-            else:
                 st.info("Ni podobnih vozil v bazi za ta filter.")
